@@ -6,7 +6,11 @@ package me.cdkrot.javahw.hashmap;
  */
 public class HashMap {
     private int curSize = 0;
-    private HashMapNode[] buckets = new HashMapNode[1024];
+    private final int initialBuckets = 1024;
+    private final int growFactor = 2;
+    private final int maxRate = 2;
+    
+    private HashMapNode[] buckets = new HashMapNode[initialBuckets];
     
     /**
      * Get hashmap size
@@ -22,7 +26,12 @@ public class HashMap {
      * @return boolean, the answer
      */
     public boolean contains(String key) {
-        return get(key) != null;
+        int id = getBucketID(key);
+        
+        for (HashMapNode node = buckets[id]; node != null; node = node.next)
+            if (node.key.equals(key))
+                return true;
+        return false;
     }
     
     /**
@@ -42,8 +51,8 @@ public class HashMap {
     /**
      * Set the key in hashmap
      * @param key
-     * @param value, null to delete the element
-     * @return previous value, if any, null otherwise.
+     * @param value
+     * @return previous value
      */
     public String put(String key, String value) {
         String res = putImpl(key, value);
@@ -58,45 +67,48 @@ public class HashMap {
         for (HashMapNode node = buckets[id]; node != null; prev = node, node = node.next)
             if (node.key.equals(key)) {
                 String res = node.value;
-                if (value != null) {
-                    node.value = value;
-                } else {
-                    // well, in reasonable languages like C(++)
-                    // there would be only one case
-                    // but who said, that java is reasonable?
-                    
-                    if (prev == null)
-                        buckets[id] = node.next;
-                    else
-                        prev.next = node.next;
-                    
-                    curSize -= 1;
-                }
-                
+                node.value = value;                
                 return res;
             }
         
-        if (value != null) {
-            curSize += 1;
-            
-            HashMapNode node = new HashMapNode();
-            node.key = key;
-            node.value = value;
-            node.next = buckets[id];
-            buckets[id] = node;
-        }
+        curSize += 1;
+        
+        HashMapNode node = new HashMapNode();
+        node.key = key;
+        node.value = value;
+        node.next = buckets[id];
+        buckets[id] = node;
         
         return null;
     }
     
     /**
      * Removes the key from hashmap
-     * Efficiently same as put(key, null)
      * @param key
      * @return the previous element
      */
     public String remove(String key) {
-        return put(key, null);
+        int id = getBucketID(key);
+        
+        HashMapNode prev = null;
+        for (HashMapNode node = buckets[id]; node != null; prev = node, node = node.next)
+            if (node.key.equals(key)) {
+                // well, in reasonable languages like C(++)
+                // there would be only one case
+                // but who said, that java is reasonable?
+
+                String res = node.value;
+                
+                if (prev == null)
+                    buckets[id] = node.next;
+                else
+                    prev.next = node.next;
+                
+                curSize -= 1;
+                return res;
+            }
+        
+        return null;
     }
     
     /**
@@ -104,15 +116,15 @@ public class HashMap {
      */
     public void clear() {
         curSize = 0;
-        buckets = new HashMapNode[1024];
+        buckets = new HashMapNode[initialBuckets];
     }
     
     private void rehash() {
-        if (4 * curSize <= buckets.length)
+        if (curSize <= maxRate * buckets.length)
             return;
         
         HashMapNode[] old = buckets;
-        buckets = new HashMapNode[2 * old.length];
+        buckets = new HashMapNode[growFactor * old.length];
         
         for (int id = 0; id != old.length; ++id)
             for (HashMapNode node = old[id]; node != null; node = node.next) {
@@ -127,5 +139,22 @@ public class HashMap {
     
     private int getBucketID(String s) {
         return s.hashCode() & (buckets.length - 1);
+    }
+
+    /**
+     * Supporting class for HashMap, represents node of list in HashMap's bucket.
+     * @author Sayutin Dmitry
+     */
+    static private class HashMapNode {
+        public HashMapNode() {}
+        public HashMapNode(String key, String value, HashMapNode next) {
+            this.key   = key;
+            this.value = value;
+            this.next  = next;
+        }
+        
+        public String key;
+        public String value;
+        public HashMapNode next;
     }
 }

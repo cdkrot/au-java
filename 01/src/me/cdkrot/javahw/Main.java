@@ -27,7 +27,7 @@ public class Main {
     /**
      * Hand-written tests
      */
-    public static void test_simple() {
+    public static void testSimple() {
         HashMap map = new HashMap();
         
         expect(map.size() == 0, "[01] map.size()");
@@ -39,7 +39,7 @@ public class Main {
         map.put("123", "228");
         expect(map.size() == 1, "[05] map.size()");
         expect(map.contains("123") == true, "[06] map.contains()");
-        expect(map.contains("aba") == false, "[07] map.contains()");        
+        expect(map.contains("aba") == false, "[07] map.contains()");
         expect(map.contains("456") == false, "[08] map.contains()");
         expect(map.get("123").equals("228"), "[08] map.get()");
         
@@ -48,7 +48,7 @@ public class Main {
         expect(map.size() == 2, "[09] map.size()");
         expect(map.contains("123") == true, "[10] map.contains()");
         expect(map.contains("1100") == true, "[11] map.contains()");
-        expect(map.contains("aba") == false, "[12] map.contains()");        
+        expect(map.contains("aba") == false, "[12] map.contains()");
         expect(map.contains("456") == false, "[13] map.contains()");
         expect(map.get("123").equals("228"), "[14] map.get()");
         expect(map.get("1100").equals("mechmath"), "[15] map.get()");
@@ -56,15 +56,16 @@ public class Main {
         map.put("123", null);
         map.put("1100", "new value");
         
-        expect(map.size() == 1, "[16] map.size()");
-        expect(map.contains("123") == false, "[17] map.contains()");
+        expect(map.size() == 2, "[16] map.size()");
+        expect(map.contains("123") == true, "[17] map.contains()");
         expect(map.contains("1100") == true, "[18] map.contains()");
-        expect(map.contains("aba") == false, "[19] map.contains()");        
+        expect(map.contains("aba") == false, "[19] map.contains()");
         expect(map.get("123") == null, "[20] map.get()");
         expect(map.get("1100").equals("new value"), "[21] map.get()");
         
         map.remove("1100");
-        
+        map.remove("123");
+
         expect(map.size() == 0, "[22] map.size()");
         expect(map.contains("1100") == false, "[23] map.contains()");
         expect(map.contains("123") == false, "[24] map.contains()");
@@ -74,7 +75,7 @@ public class Main {
         map.put("1", null);
         map.put("2", "1111");
         
-        expect(map.size() == 2, "[26] map.size()");
+        expect(map.size() == 3, "[26] map.size()");
         
         map.clear();
         
@@ -85,7 +86,7 @@ public class Main {
     /**
      * Automated testing on big, but simple test
      */
-    public static void test_rehash() {
+    public static void testRehash() {
         HashMap map = new HashMap();
         
         for (int i = 1; i <= 10000; ++i) {
@@ -110,8 +111,8 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Testing HashMap");
         
-        test_simple();
-        test_rehash();
+        testSimple();
+        testRehash();
         
         System.out.println("PASSED");
         System.out.println("Total " + testsPassed + " assertions succeeded");
