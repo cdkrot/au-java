@@ -73,11 +73,7 @@ public class HashMap {
         
         curSize += 1;
         
-        HashMapNode node = new HashMapNode();
-        node.key = key;
-        node.value = value;
-        node.next = buckets[id];
-        buckets[id] = node;
+        buckets[id] = new HashMapNode(key, value, buckets[id]);
         
         return null;
     }
@@ -129,11 +125,7 @@ public class HashMap {
         for (int id = 0; id != old.length; ++id)
             for (HashMapNode node = old[id]; node != null; node = node.next) {
                 int nid = getBucketID(node.key);
-                HashMapNode newnode = new HashMapNode();
-                newnode.key   = node.key;
-                newnode.value = node.value;
-                newnode.next = buckets[nid];
-                buckets[nid] = newnode;
+                buckets[nid] = new HashMapNode(node.key, node.value, buckets[nid]);
             }
     }
     
