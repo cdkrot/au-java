@@ -26,7 +26,13 @@ public class Trie {
     };
 
     private Node root = new Node();
-    
+
+    /**
+     * Adds string to trie, if it it wasn't in it.
+     *
+     * @param s, string to add
+     * @return true, if it didn't existed
+     */
     public boolean add(String s) {
         Node cur = root;
         for (int i = 0; i != s.length(); ++i)
@@ -41,7 +47,12 @@ public class Trie {
         }
         return false;
     }
-    
+
+    /**
+     * Checks if the string is in Trie
+     * @param s, string to check
+     * @return true, if s is contained in Trie.
+     */
     public boolean containsKey(String s) {
         Node cur = root;
         for (int i = 0; i != s.length(); ++i)
@@ -52,7 +63,12 @@ public class Trie {
         
         return cur.term;
     }
-    
+
+    /**
+     * Removes string from trie, if it exists.
+     * @param s, string to remove
+     * @return true, if it existed.
+     */
     public boolean remove(String s) {
         Node cur = root;
         for (int i = 0; i != s.length(); ++i)
@@ -80,10 +96,19 @@ public class Trie {
         return false;
     }
 
+    /**
+     * Returns number of stored strings
+     * @return the number
+     */
     public int size() {
         return root.subtree;
     }
 
+    /**
+     * Counts number of string with given prefix
+     * @param s, the prefix
+     * @return the number
+     */
     public int howManyStartsWithPrefix(String s) {
         Node cur = root;
         for (int i = 0; i != s.length(); ++i)
@@ -95,13 +120,20 @@ public class Trie {
         return cur.subtree;
     }
 
+    /**
+     * Writes Trie to stream
+     * @param stream, to write to.
+     */
     public void serialize(OutputStream stream) throws IOException {
         ObjectOutputStream oos = new ObjectOutputStream(stream);
         oos.writeObject(root);
         oos.close(); 
     }
 
-
+    /**
+     * Reads Trie from stream
+     * @param stream, to read from.
+     */
     public void deserialize(InputStream in) throws IOException, ClassNotFoundException {
         ObjectInputStream ois = new ObjectInputStream(in);
         root = (Node) ois.readObject();
