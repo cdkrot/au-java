@@ -1,16 +1,20 @@
 package me.cdkrot.javahw;
 
 import java.util.Arrays;
+import java.io.PrintStream;
 
+/**
+ * Spiral, provides spiral printing and sorting by columns.
+ */
 public class Spiral {
     /**
      * Prints square matrix of odd size to stdout
      * @param mat -- matrix to print
      */
-    public static void printSpiral(int[][] mat) {
+    public static void printSpiral(int[][] mat, PrintStream stream) {
         int n = mat.length;
         
-        System.out.println(mat[n / 2][n / 2]);
+        stream.println(mat[n / 2][n / 2]);
         int i = n / 2;
         int j = n / 2 + 1;
         
@@ -21,25 +25,25 @@ public class Spiral {
             switch (dir) {
                 case 0:
                     for (int dt = 0; dt != len; ++dt)
-                        System.out.println(mat[i + dt][j]);
+                        stream.println(mat[i + dt][j]);
                     i += len - 1;
                     j -= 1;
                     break;
                 case 1:
                     for (int dt = 0; dt != len; ++dt) 
-                        System.out.println(mat[i][j - dt]);
+                        stream.println(mat[i][j - dt]);
                     j -= len - 1;
                     i -= 1;
                     break;
                 case 2:
                     for (int dt = 0; dt != len; ++dt)
-                        System.out.println(mat[i - dt][j]);
+                        stream.println(mat[i - dt][j]);
                     i -= len - 1;
                     j += 1;
                     break;
                 case 3:
                     for (int dt = 0; dt != len; ++dt)
-                        System.out.println(mat[i][j + dt]);
+                        stream.println(mat[i][j + dt]);
                     j += len;
                     len += 2;                    
             }

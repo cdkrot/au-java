@@ -9,28 +9,24 @@ import java.io.ByteArrayOutputStream;
 import me.cdkrot.javahw.Spiral;
 
 public class SpiralTest {
-    private ByteArrayOutputStream captured;
-    private PrintStream orig;
+    private ByteArrayOutputStream stream;
     
     @Before
     public void setUp() {
-        orig = System.out;
-        captured = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(captured));
+        stream = new ByteArrayOutputStream();
     }
 
     @After
     public void tearDown() {
-        System.setOut(orig);
-        captured = null;
+        stream = null;
     }
 
     @Test
     public void testPrintSpiralTiny() {
         int[][] arr = {{5}};
-        Spiral.printSpiral(arr);
+        Spiral.printSpiral(arr, new PrintStream(stream));
         
-        assertEquals(captured.toString(), "5\n");
+        assertEquals(stream.toString(), "5\n");
     }
     
     @Test
@@ -43,12 +39,12 @@ public class SpiralTest {
             {21, 22, 23, 24, 25}
         };
 
-        Spiral.printSpiral(arr);
+        Spiral.printSpiral(arr, new PrintStream(stream));
 
         String exp = "13\n14\n19\n18\n17\n12\n7\n8\n9\n10\n15\n20\n25\n24\n23\n22\n21\n";
         exp += "16\n11\n6\n1\n2\n3\n4\n5\n";
         
-        assertEquals(captured.toString(), exp);
+        assertEquals(stream.toString(), exp);
     }
 
     @Test
