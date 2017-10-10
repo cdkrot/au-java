@@ -47,8 +47,11 @@ public class Zipper {
      * @param base, directory to extract to.
      */
     public static void extractEntry(ZipFile zip, ZipEntry entry, String base) throws IOException {
+        File result = new File(base, entry.getName());
+        result.getParentFile().mkdirs();
+        
         try (InputStream in = zip.getInputStream(entry);
-             OutputStream out = new FileOutputStream(new File(base, entry.getName()))) {
+             OutputStream out = new FileOutputStream(result)) {
 
             byte[] buf = new byte[4096];
             while (true) {
