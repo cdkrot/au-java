@@ -2,7 +2,15 @@ package me.cdkrot.javahw;
 
 import java.io.*;
 
+/**
+ * Main class of a program
+ */
 public class Main {
+    /**
+     * Attempts to parse string as Integer
+     * @param String to parse
+     * @return Just int, on success, Nothing on fail.
+     */
     public static Maybe<Integer> parseString(String s) {
         try {
             return Maybe.just(Integer.parseInt(s));            
@@ -30,7 +38,11 @@ public class Main {
             }
         }
     }
-    
+
+    /**
+     * Entry point
+     * @param args, command line args
+     */
     public static void main(String[] args) throws IOException {
         if (args.length != 2) {
             System.err.println("Error: not enough arguments");
