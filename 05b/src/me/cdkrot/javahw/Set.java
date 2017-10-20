@@ -63,6 +63,9 @@ public class Set <T extends Comparable<? super T>> {
 
     /**
      * Split root to (<, >=)
+     * @param root, the node to split
+     * @param key, by which key.
+     * @return Pair of split result
      */
     private static <U extends Comparable<? super U>> NodePair<U> split(Node<U> root, U key) {
         if (root == null)
