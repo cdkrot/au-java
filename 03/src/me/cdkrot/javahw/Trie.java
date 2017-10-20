@@ -3,15 +3,18 @@ package me.cdkrot.javahw;
 import java.util.HashMap;
 import java.io.*;
 
+/**
+ * Implements the Trie data structure
+ */
 public class Trie {
     private static class Node implements Serializable {
-        public boolean term = false;
-        public int subtree = 0;
+        boolean isTerm = false;
+        int subtreeSize = 0;
         
-        public Node parent = null;
-        public char charParent = 0;
+        Node parent = null;
+        char charParent = 0;
         
-        public HashMap<Character, Node> go = new HashMap<Character, Node>();
+        HashMap<Character, Node> go = new HashMap<Character, Node>();
 
         public Node get(char ch) {
             if (!go.containsKey(ch)) {
@@ -38,11 +41,11 @@ public class Trie {
         for (int i = 0; i != s.length(); ++i)
             cur = cur.get(s.charAt(i));
         
-        if (!cur.term) {
-            cur.term = true;
+        if (!cur.isTerm) {
+            cur.isTerm = true;
             
             for (; cur != null; cur = cur.parent)
-                cur.subtree += 1;
+                cur.subtreeSize += 1;
             return true;
         }
         return false;
@@ -61,7 +64,7 @@ public class Trie {
             else
                 return false;
         
-        return cur.term;
+        return cur.isTerm;
     }
 
     /**
@@ -77,14 +80,14 @@ public class Trie {
             else
                 return false;
 
-        if (cur.term) {
-            cur.term = false;
+        if (cur.isTerm) {
+            cur.isTerm = false;
 
             while (cur != null) {
-                cur.subtree -= 1;
+                cur.subtreeSize -= 1;
                 Node par = cur.parent;
                 
-                if (cur.subtree == 0 && par != null)
+                if (cur.subtreeSize == 0 && par != null)
                     par.go.remove(cur.charParent);
 
                 cur = par;
@@ -101,7 +104,7 @@ public class Trie {
      * @return the number
      */
     public int size() {
-        return root.subtree;
+        return root.subtreeSize;
     }
 
     /**
@@ -117,12 +120,13 @@ public class Trie {
             else
                 return 0;
 
-        return cur.subtree;
+        return cur.subtreeSize;
     }
 
     /**
      * Writes Trie to stream
      * @param stream, to write to.
+     * @throws IOException, when failed to write.
      */
     public void serialize(OutputStream stream) throws IOException {
         ObjectOutputStream oos = new ObjectOutputStream(stream);
@@ -133,6 +137,8 @@ public class Trie {
     /**
      * Reads Trie from stream
      * @param stream, to read from.
+     * @throws IOException, when fails to read.
+     * @throws ClassNotFoundException, when data is not valid.
      */
     public void deserialize(InputStream in) throws IOException, ClassNotFoundException {
         ObjectInputStream ois = new ObjectInputStream(in);
