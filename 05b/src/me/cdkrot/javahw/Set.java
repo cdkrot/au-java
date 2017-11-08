@@ -1,6 +1,7 @@
 package me.cdkrot.javahw;
 
 import java.util.Random;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents set of <T>.
@@ -45,7 +46,7 @@ public class Set <T extends Comparable<? super T>> {
         Node<U> second;
     }
     
-    private static <U> Node<U> merge(Node<U> l, Node<U> r) {
+    private static <U> Node<U> merge(@Nullable Node<U> l, @Nullable Node<U> r) {
         if (l == null)
             return r;
         if (r == null)
