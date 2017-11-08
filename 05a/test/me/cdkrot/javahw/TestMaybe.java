@@ -6,14 +6,14 @@ import static org.junit.Assert.assertFalse;
 import org.junit.Test; 
 
 public class TestMaybe {
-    @Test(expected = NothingException.class) 
-    public void testGetNothing() throws NothingException {
+    @Test(expected = EmptyValueException.class) 
+    public void testGetNothing() throws EmptyValueException {
         Maybe<Integer> mb = Maybe.nothing();
         int val = mb.get();
     }
 
     @Test
-    public void testGet() throws NothingException {
+    public void testGet() throws EmptyValueException {
         Maybe<Integer> mb = Maybe.just(3);
         assertEquals((int)(mb.get()), 3);
     }
