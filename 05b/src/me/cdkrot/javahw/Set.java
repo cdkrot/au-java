@@ -7,15 +7,16 @@ import java.util.Random;
  */
 public class Set <T extends Comparable<? super T>> {
     private Random rnd = new Random(228);
+    private Node<T> root = null;
     
     private static class Node<U> {
-        public U value;
-        public int prio;
-        public Node<U> left;
-        public Node<U> right;
-        public int size;
+        U value;
+        int prio;
+        Node<U> left;
+        Node<U> right;
+        int size;
 
-        public void recalc() {
+        void recalc() {
             size = 1;
             if (left != null)
                 size += left.size;
@@ -35,7 +36,7 @@ public class Set <T extends Comparable<? super T>> {
     }
     
     private static class NodePair<U> {
-        public NodePair(Node<U> a, Node<U> b) {
+        NodePair(Node<U> a, Node<U> b) {
             first = a;
             second = b;
         }
@@ -96,8 +97,6 @@ public class Set <T extends Comparable<? super T>> {
             root = root.right;
         return root;
     }
-
-    Node<T> root = null;
 
     /**
      * Adds element to Set
