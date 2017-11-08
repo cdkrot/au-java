@@ -68,7 +68,7 @@ public class Collections {
         ArrayList<A> result = new ArrayList<A>();
 
         for (A a: iter)
-            if (!f.apply(a))
+            if (f.apply(a))
                 break;
             else
                 result.add(a);
