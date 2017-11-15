@@ -111,7 +111,7 @@ public class TestTreeSet {
         assertEquals((int)set.last(), 4);
         set.clear();
         
-        assertEquals(set.first(), null);
+        assertEquals(set.last(), null);
     }
 
     @Test
@@ -186,5 +186,114 @@ public class TestTreeSet {
             lst.add(iter.next());
 
         assertEquals(lst, Arrays.asList(4, 3, 2, 1, 0));
+    }
+
+    @Test
+    public void testDescendingSetFwdIteration() {
+        ArrayList<Integer> lst = new ArrayList<Integer>();
+
+        TreeSet<Integer> set = new TreeSet<Integer>();
+        for (int i = 0; i != 5; ++i)
+            set.add(i);
+
+        Iterator<Integer> iter = set.descendingSet().iterator();
+        while (iter.hasNext())
+            lst.add(iter.next());
+
+        assertEquals(lst, Arrays.asList(4, 3, 2, 1, 0));        
+    }
+
+    @Test
+    public void testDescendingSetBckIteration() {
+        ArrayList<Integer> lst = new ArrayList<Integer>();
+
+        TreeSet<Integer> set = new TreeSet<Integer>();
+        for (int i = 0; i != 5; ++i)
+            set.add(i);
+
+        Iterator<Integer> iter = set.descendingSet().descendingIterator();
+        while (iter.hasNext())
+            lst.add(iter.next());
+
+        assertEquals(lst, Arrays.asList(0, 1, 2, 3, 4));
+    }
+
+    @Test
+    public void testDescendingSetBasic() {
+        TreeSet<Integer> set = new TreeSet<Integer>();
+        for (int i = 0; i != 5; ++i)
+            set.add(i);
+
+        MyTreeSet<Integer> dset = set.descendingSet();
+
+        assertEquals(dset.size(), 5);
+        assertTrue(dset.contains(4));
+        assertTrue(dset.contains(2));
+        assertFalse(dset.contains(6));
+    }
+
+    @Test
+    public void testDescendingSetAddRemove() {
+        TreeSet<Integer> set = new TreeSet<Integer>();
+        for (int i = 0; i != 5; ++i)
+            set.add(i);
+
+        MyTreeSet<Integer> dset = set.descendingSet();
+
+        dset.add(10);
+        dset.remove(3);
+        
+        assertEquals(set.size(), 5);
+        assertTrue(set.contains(4));
+        assertTrue(set.contains(10));
+        assertTrue(set.contains(2));
+        assertFalse(set.contains(3));
+    }
+    
+    @Test
+    public void testDescendingFirst() {
+        TreeSet<Integer> set = new TreeSet<Integer>();
+
+        for (int i = 0; i != 5; ++i)
+            set.add(i);
+
+        assertEquals((int)set.descendingSet().first(), 4);
+        set.clear();
+        
+        assertEquals(set.descendingSet().first(), null);
+    }
+    
+    @Test
+    public void testDescendingLast() {
+        TreeSet<Integer> set = new TreeSet<Integer>();
+
+        for (int i = 0; i != 5; ++i)
+            set.add(i);
+
+        assertEquals((int)set.descendingSet().last(), 0);
+        set.clear();
+        
+        assertEquals(set.descendingSet().last(), null);
+    }
+
+    @Test
+    public void testCustomComparator() {
+        TreeSet<String> set = new TreeSet<String>(new Comparator<String>() {
+                public int compare(String a, String b) {
+                    return a.length() - b.length();
+                }
+            });
+
+        set.add("3");
+        set.add("22");
+        set.add("111");
+
+        ArrayList<String> lst = new ArrayList<String>();
+        Iterator<String> it = set.iterator();
+
+        while (it.hasNext())
+            lst.add(it.next());
+        
+        assertEquals(lst, Arrays.asList("3", "22", "111"));
     }
 }

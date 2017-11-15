@@ -5,9 +5,23 @@ import java.util.*;
 /**
  * Represents set of <T>.
  */
-public class TreeSet<T extends Comparable<? super T>> implements MyTreeSet<T> {
+public class TreeSet<T> implements MyTreeSet<T> {
     private Random rnd = new Random(228);
     private Node<T> root = null;
+
+    private Comparator<? super T> cmp = null;
+
+    public TreeSet() {
+        cmp = new Comparator<T>() {
+                public int compare(T a, T other) {
+                    return ((Comparable)a).compareTo(other);
+                }
+            };
+    }
+
+    public TreeSet(Comparator<? super T> cmp) {
+        this.cmp = cmp;
+    }
     
     private static class Node<U> {
         U value;
@@ -123,13 +137,21 @@ public class TreeSet<T extends Comparable<? super T>> implements MyTreeSet<T> {
             TreeSet.this.clear();
         }
         
-        public T lower(T elem) {return null;}
+        public T lower(T elem) {
+            return TreeSet.this.higher(elem);
+        }
 
-        public T floor(T elem) {return null;}
+        public T floor(T elem) {
+            return TreeSet.this.ceiling(elem);
+        }
 
-        public T ceiling(T elem) {return null;}
+        public T ceiling(T elem) {
+            return TreeSet.this.floor(elem);
+        }
 
-        public T higher(T elem) {return null;}
+        public T higher(T elem) {
+            return TreeSet.this.lower(elem);
+        }
 
         public int size() {
             return TreeSet.this.size();
@@ -192,24 +214,24 @@ public class TreeSet<T extends Comparable<? super T>> implements MyTreeSet<T> {
             return r;
         }
     }
-
+    
     /**
      * Split root to (<, >=)
      * @param root, the node to split
      * @param key, by which key.
      * @return Pair of split result
      */
-    private static <U extends Comparable<? super U>> NodePair<U> split(Node<U> root, U key) {
+    private static <U> NodePair<U> split(Node<U> root, U key, Comparator<? super U> cmp) {
         if (root == null)
             return new NodePair<U>(null, null);
-        if (root.value.compareTo(key) < 0) {
-            NodePair<U> spl = split(root.right, key);
+        if (cmp.compare(root.value, key) < 0) {
+            NodePair<U> spl = split(root.right, key, cmp);
             root.right = spl.first;
             root.recalc();
             
             return new NodePair<U>(root, spl.second);
         } else {
-            NodePair<U> spl = split(root.left, key);
+            NodePair<U> spl = split(root.left, key, cmp);
             root.left = spl.second;
             root.recalc();
             
@@ -248,9 +270,9 @@ public class TreeSet<T extends Comparable<? super T>> implements MyTreeSet<T> {
      * @return boolean, if added
      */
     public boolean add(T value) {
-        NodePair<T> spl = split(root, value);
+        NodePair<T> spl = split(root, value, cmp);
 
-        if (spl.second != null && getLeft(spl.second).value.compareTo(value) == 0) {
+        if (spl.second != null && cmp.compare(getLeft(spl.second).value, value) == 0) {
             root = merge(spl.first, spl.second);
             return false;
         }
@@ -277,10 +299,10 @@ public class TreeSet<T extends Comparable<? super T>> implements MyTreeSet<T> {
      * @return boolean, if deleted
      */
     public boolean remove(Object v) {
-        T value = (T)v;
-        NodePair<T> spl = split(root, value);
+        T value = (T) v;
+        NodePair<T> spl = split(root, value, cmp);
 
-        if (spl.second == null || getLeft(spl.second).value.compareTo(value) != 0) {
+        if (spl.second == null || cmp.compare(getLeft(spl.second).value, value) != 0) {
             root = merge(spl.first, spl.second); // nothing to do.
             return false;
         }
@@ -310,11 +332,11 @@ public class TreeSet<T extends Comparable<? super T>> implements MyTreeSet<T> {
         T value = (T)v;
         Node<T> cur = root;
         while (cur != null) {
-            int cmp = cur.value.compareTo(value);
+            int cr = cmp.compare(cur.value, value);
 
-            if (cmp == 0)
+            if (cr == 0)
                 return true;
-            else if (cmp < 0)
+            else if (cr < 0)
                 cur = cur.right;
             else
                 cur = cur.left;
@@ -380,9 +402,9 @@ public class TreeSet<T extends Comparable<? super T>> implements MyTreeSet<T> {
         if (nd == null)
             return null;
 
-        if (nd.value.compareTo(elem) < 0)
+        if (cmp.compare(nd.value, elem) < 0)
             return lowerBound(nd.right, elem);
-        else if (nd.value.compareTo(elem) == 0)
+        else if (cmp.compare(nd.value, elem) == 0)
             return nd;
         else {
             Node<T> tmp;
@@ -396,7 +418,7 @@ public class TreeSet<T extends Comparable<? super T>> implements MyTreeSet<T> {
         if (nd == null)
             return null;
 
-        if (nd.value.compareTo(elem) <= 0)
+        if (cmp.compare(nd.value, elem) <= 0)
             return upperBound(nd.right, elem);
         else {
             Node<T> tmp;
