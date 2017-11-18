@@ -1,6 +1,6 @@
 package me.cdkrot.javahw;
 
-import java.util.HashMap;
+import java.util.*;
 import java.io.*;
 
 /**
@@ -123,26 +123,66 @@ public class Trie {
         return cur.subtreeSize;
     }
 
+    private interface Visitor {
+        public void visit(String str) throws IOException;
+    };
+    
+    private void visit(Node nd, String cur, Visitor visitor) throws IOException {
+        if (nd.isTerm)
+            visitor.visit(cur);
+            
+        for (Map.Entry<Character, Node> go: nd.go.entrySet())
+            visit(go.getValue(), cur + go.getKey(), visitor);
+    }
+    
     /**
      * Writes Trie to stream
      * @param stream, to write to.
      * @throws IOException, when failed to write.
      */
     public void serialize(OutputStream stream) throws IOException {
-        ObjectOutputStream oos = new ObjectOutputStream(stream);
-        oos.writeObject(root);
-        oos.close(); 
+        Writer w = new OutputStreamWriter(stream, "utf-8");
+        if (root != null)
+            visit(root, "", new Visitor() {
+                    public void visit(String str) throws IOException {
+                        w.write(str);
+                        w.write(0);
+                    }
+                });
+
+        w.write(0);
+        w.flush();
+        w.close();
     }
 
     /**
      * Reads Trie from stream
      * @param stream, to read from.
      * @throws IOException, when fails to read.
-     * @throws ClassNotFoundException, when data is not valid.
      */
-    public void deserialize(InputStream in) throws IOException, ClassNotFoundException {
-        ObjectInputStream ois = new ObjectInputStream(in);
-        root = (Node) ois.readObject();
-        ois.close();
+    public void deserialize(InputStream in) throws IOException {
+        Reader r = new InputStreamReader(in, "utf-8");
+        root = new Node();
+
+        while (true) {
+            ArrayList<Byte> lst = new ArrayList<Byte>();
+
+            while (true) {
+                int b = r.read();
+
+                if (b == 0 || b == -1)
+                    break;
+                lst.add((byte)b);
+            }
+
+            if (lst.isEmpty())
+                break;
+
+            byte[] bts = new byte[lst.size()];
+            for (int i = 0; i != lst.size(); ++i)
+                bts[i] = lst.get(i);
+
+            add(new String(bts, "utf-8"));
+        }
     } 
 }

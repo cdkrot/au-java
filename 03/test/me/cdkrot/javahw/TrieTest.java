@@ -106,21 +106,11 @@ public class TrieTest {
 
     @Test
     public void testIOHardWay() throws ClassNotFoundException, IOException {
-        String b64 =
-            "rO0ABXNyABptZS5jZGtyb3QuamF2YWh3LlRyaWUkTm9kZeU14U1E8lHYAgAFQwAKY2hhclBh" +
-            "cmVudFoABmlzVGVybUkAC3N1YnRyZWVTaXplTAACZ290ABNMamF2YS91dGlsL0hhc2hNYXA7" +
-            "TAAGcGFyZW50dAAcTG1lL2Nka3JvdC9qYXZhaHcvVHJpZSROb2RlO3hwAAAAAAAAA3NyABFq" +
-            "YXZhLnV0aWwuSGFzaE1hcAUH2sHDFmDRAwACRgAKbG9hZEZhY3RvckkACXRocmVzaG9sZHhw" +
-            "P0AAAAAAAAx3CAAAABAAAAACc3IAE2phdmEubGFuZy5DaGFyYWN0ZXI0i0fZaxomeAIAAUMA" +
-            "BXZhbHVleHAAMXNxAH4AAAAxAQAAAAJzcQB+AAQ/QAAAAAAADHcIAAAAEAAAAAFzcQB+AAYA" +
-            "MnNxAH4AAAAyAQAAAAFzcQB+AAQ/QAAAAAAAAHcIAAAAEAAAAAB4cQB+AAh4cQB+AANzcQB+" +
-            "AAYANHNxAH4AAAA0AAAAAAFzcQB+AAQ/QAAAAAAADHcIAAAAEAAAAAFzcQB+AAYANXNxAH4A" +
-            "AAA1AQAAAAFzcQB+AAQ/QAAAAAAAAHcIAAAAEAAAAAB4cQB+AA54cQB+AAN4cA==";
-
-        // b64 contains Trie of "1", "12" and "45".
+        byte[] theTree = {'1', 0, '1', '2', 0, '4', '5', 0, 0};
+        // Trie with "1", "12" and "45"
         
         Trie trie = new Trie();
-        trie.deserialize(new ByteArrayInputStream(Base64.getDecoder().decode(b64)));
+        trie.deserialize(new ByteArrayInputStream(theTree));
 
         assertEquals(trie.size(), 3);
         assertTrue(trie.containsKey("1"));
