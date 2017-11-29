@@ -5,7 +5,13 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import org.junit.Test; 
 
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import static org.mockito.Mockito.*;
+
 import java.math.BigInteger;
+import java.util.*;
 
 public class TestCalculator {
     protected String eval(String expr) {
@@ -74,5 +80,59 @@ public class TestCalculator {
         assertFalse(correct("1 + )"));
         assertFalse(correct("1 +"));
         assertFalse(correct("* 1"));
+    }
+
+    public void testReversePolishEvaluation() {
+        // Evaling "1 + 5 * 7
+        
+        List<Object> RPN = new ArrayList<Object>();
+        RPN.add(new BigInteger("1"));
+        RPN.add(new BigInteger("5"));
+        RPN.add(new BigInteger("7"));
+
+        RPN.add(Calculator.BinaryOperator.fromChar('*'));
+        RPN.add(Calculator.BinaryOperator.fromChar('+'));
+        
+        Calculator calc = new Calculator(new SimpleStack<Character>(), new SimpleStack<BigInteger>());
+        
+        assertEquals(calc.compute(RPN), new BigInteger("36"));
+    }
+    
+    public void testEvaluationProcess() {
+        // Evaling "1 + 5 * 7"
+
+        List<Object> RPN = new ArrayList<Object>();
+        RPN.add(new BigInteger("1"));
+        RPN.add(new BigInteger("5"));
+        RPN.add(new BigInteger("7"));
+
+        RPN.add(Calculator.BinaryOperator.fromChar('*'));
+        RPN.add(Calculator.BinaryOperator.fromChar('+'));
+        
+        Stack<BigInteger> operands = mock(Stack.class);
+
+        Calculator calc = new Calculator(null, operands);
+        
+        when(operands.top()).thenReturn(new BigInteger("7"), new BigInteger("5"), new BigInteger("35"), new BigInteger("1"), new BigInteger("36"));
+
+        when(operands.size()).thenReturn(2, 2, 1);
+        
+        assertEquals(calc.compute(RPN), new BigInteger("36"));
+
+        InOrder inorder = inOrder(operands);
+        inorder.verify(operands).push(new BigInteger("7"));
+        inorder.verify(operands).push(new BigInteger("5"));
+        inorder.verify(operands).top();
+        inorder.verify(operands).pop();
+        inorder.verify(operands).top();
+        inorder.verify(operands).pop();
+        inorder.verify(operands).push(new BigInteger("35"));
+        inorder.verify(operands).push(new BigInteger("1"));
+        inorder.verify(operands).top();
+        inorder.verify(operands).pop();
+        inorder.verify(operands).top();
+        inorder.verify(operands).pop();
+        inorder.verify(operands).push(new BigInteger("36"));
+        inorder.verify(operands).top();
     }
 }
