@@ -24,7 +24,7 @@ public class SecondPartTasksTest {
         writeFile(new File(tmp.getRoot(), "1.txt"), "aba\ncaba\nd\ncccc");
         writeFile(new File(tmp.getRoot(), "2.txt"), "lol kek cheburek");
         writeFile(new File(tmp.getRoot(), "3.txt"), "keker caba\naba\nmda");
-        writeFile(new File(tmp.getRoot(), "4.txt"), "java musor");
+        writeFile(new File(tmp.getRoot(), "4.txt"), "trash");
 
         String base = tmp.getRoot().getPath();
         assertEquals(SecondPartTasks.findQuotes(Arrays.asList(base + "/1.txt",
