@@ -6,8 +6,6 @@ import static org.junit.Assert.assertFalse;
 import org.junit.Test; 
 
 import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import static org.mockito.Mockito.*;
 
 import java.math.BigInteger;

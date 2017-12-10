@@ -47,7 +47,7 @@ public class Calculator {
     
     /**
      * Compute the RPN.
-     * @param list of Either "BinaryOperator" or "BigInteger".
+     * @param lst list of Either "BinaryOperator" or "BigInteger".
      * @return resulting BigInteger
      * @throws IllegalArgumentException for ill-formed lists.
      * @throws ArithmeticException on div by zero and similar.
@@ -116,7 +116,7 @@ public class Calculator {
     }
 
     public boolean isValidExpression(String str) {
-        /**
+        /*
          * ( -> -1
          * ) -> +1
          * number -> 0
@@ -155,13 +155,6 @@ public class Calculator {
                     return false;
             }
 
-            
-            /**
-             * ( -> -1
-             * ) -> +1
-             * number -> 0
-             * operator -> 2.
-             */
             if (curToken == 2) {
                 if (prevToken != 1 && prevToken != 0)
                     return false;
@@ -192,7 +185,7 @@ public class Calculator {
     
     /**
      * Parse this string to RPN.
-     * @param String to parse
+     * @param str String to parse
      * @result list of Either "BinaryOperator" or "BigInteger" which applicable for eval().
      * @throws IllegalArgumentException for ill-formed expressions.
      */    
