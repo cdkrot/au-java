@@ -115,6 +115,10 @@ public class Calculator {
         }
     }
 
+    private static boolean isDigit(char ch) {
+        return '0' <= ch && ch <= '9';
+    }
+    
     public boolean isValidExpression(String str) {
         /*
          * ( -> -1
@@ -137,9 +141,9 @@ public class Calculator {
             if (i == str.length()) {
                 curToken = +1;
                 i += 1;
-            } else if ('0' <= str.charAt(i) && str.charAt(i) <= '9') {
+            } else if (isDigit(str.charAt(i))) {
                 int i0 = i;
-                while (i != str.length() && '0' <= str.charAt(i) && str.charAt(i) <= '9')
+                while (i != str.length() && isDigit(str.charAt(i)))
                     i += 1;
                 
                 curToken = 0;
@@ -197,9 +201,9 @@ public class Calculator {
         operators.clear();
 
         for (int i = 0; i != str.length();) {
-            if ('0' <= str.charAt(i) && str.charAt(i) <= '9') {
+            if (isDigit(str.charAt(i))) {
                 int i0 = i;
-                while (i != str.length() && '0' <= str.charAt(i) && str.charAt(i) <= '9')
+                while (i != str.length() && isDigit(str.charAt(i)))
                     i += 1;
                 
                 res.add(new BigInteger(str.substring(i0, i)));

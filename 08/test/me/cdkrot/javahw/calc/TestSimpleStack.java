@@ -12,7 +12,6 @@ public class TestSimpleStack {
 
         assertEquals(stack.size(), 0);
         assertTrue(stack.empty());
-        assertEquals(stack.top(), null);
     }
 
     @Test

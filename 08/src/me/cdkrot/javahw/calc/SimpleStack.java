@@ -25,7 +25,9 @@ public class SimpleStack<T> implements Stack<T> {
      * @return the top element, null if empty().
      */
     public T top() {
-        return (head == null ? null : head.elem);
+        if (head == null)
+            throw new RuntimeException("empty stack");
+        return head.elem;
     }
 
     /**
@@ -33,10 +35,11 @@ public class SimpleStack<T> implements Stack<T> {
      * Does nothing if stack is empty.
      */
     public void pop() {
-        if (head != null) {
-            head = head.next;
-            curSize -= 1;
-        }
+        if (head == null)
+            throw new RuntimeException("empty stack");
+        
+        head = head.next;
+        curSize -= 1;
     }
 
     /**
