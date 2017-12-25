@@ -33,7 +33,7 @@ public class TreeSet<T> implements MyTreeSet<T> {
         Node<U> prev;
         Node<U> next;
         
-        void recalc() {
+        void recalcStats() {
             size = 1;
             if (left != null)
                 size += left.size;
@@ -66,20 +66,20 @@ public class TreeSet<T> implements MyTreeSet<T> {
 
     private class ForwardIterator implements Iterator<T> {
         private ForwardIterator() {
-            ptr = getLeft(root);
+            current = getLeft(root);
         }
         
-        private Node<T> ptr;
+        private Node<T> current;
         private Node<T> last;
         
         public boolean hasNext() {
-            return ptr != null;
+            return current != null;
         }
 
         public T next() {
-            last = ptr;
-            T res = ptr.value;
-            ptr = ptr.next;
+            last = current;
+            T res = current.value;
+            current = current.next;
             return res;
         }
 
@@ -90,20 +90,20 @@ public class TreeSet<T> implements MyTreeSet<T> {
 
     private class BackwardIterator implements Iterator<T> {
         private BackwardIterator() {
-            ptr = getRight(root);
+            current = getRight(root);
         }
         
-        private Node<T> ptr;
+        private Node<T> current;
         private Node<T> last;
         
         public boolean hasNext() {
-            return ptr != null;
+            return current != null;
         }
 
         public T next() {
-            last = ptr;
-            T res = ptr.value;
-            ptr = ptr.prev;
+            last = current;
+            T res = current.value;
+            current = current.prev;
             return res;
         }
 
@@ -206,11 +206,11 @@ public class TreeSet<T> implements MyTreeSet<T> {
 
         if (l.prio >= r.prio) {
             l.right = merge(l.right, r);
-            l.recalc();
+            l.recalcStats();
             return l;
         } else {
             r.left = merge(l, r.left);
-            r.recalc();
+            r.recalcStats();
             return r;
         }
     }
@@ -227,13 +227,13 @@ public class TreeSet<T> implements MyTreeSet<T> {
         if (cmp.compare(root.value, key) < 0) {
             NodePair<U> spl = split(root.right, key, cmp);
             root.right = spl.first;
-            root.recalc();
+            root.recalcStats();
             
             return new NodePair<U>(root, spl.second);
         } else {
             NodePair<U> spl = split(root.left, key, cmp);
             root.left = spl.second;
-            root.recalc();
+            root.recalcStats();
             
             return new NodePair<U>(spl.first, root);
         }
@@ -289,7 +289,7 @@ public class TreeSet<T> implements MyTreeSet<T> {
             return a.right;
 
         a.left = deleteFirst(a.left);
-        a.recalc();
+        a.recalcStats();
         return a;
     }
     
