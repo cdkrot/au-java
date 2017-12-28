@@ -60,14 +60,12 @@ public final class FirstPartTasks {
 
     // Список альбомов, отсортированный по убыванию среднего рейтинга его треков (0, если треков нет)
     public static List<Album> sortByAverageRating(Stream<Album> albums) {
-        return albums.sorted((fst, snd) -> {
-                int a = fst.getTracks().stream().collect(Collectors.summingInt(Track::getRating));
-                int b = Math.max(1, fst.getTracks().size());
-                int c = snd.getTracks().stream().collect(Collectors.summingInt(Track::getRating));
-                int d = Math.max(1, snd.getTracks().size());
-                
-                return (a * d > b * c ? -1 : (a * d == b * c ? 0 : +1));
-            }).collect(Collectors.toList());
+        return albums.sorted(Comparator.comparingDouble((alb) -> {
+                    int a = alb.getTracks().stream().collect(Collectors.summingInt(Track::getRating));
+                    int b = Math.max(1, alb.getTracks().size());
+
+                    return -(double)a / b;
+                })).collect(Collectors.toList());
     }
 
     // Произведение всех чисел потока по модулю 'modulo'
