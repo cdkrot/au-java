@@ -8,11 +8,13 @@ import java.lang.reflect.*;
  * Helper class for serialization
  */
 public class Serialization {
+    
     /**
+     * Writes object to stream
      * @param obj object to write
      * @param os output stream to use
-     * @throw IOException on io fail
-     * @throw ReflectiveOperationException when failed to work with class
+     * @throws IOException on io fail
+     * @throws ReflectiveOperationException when failed to work with class
      */
     public static void serialize(Object obj, OutputStream os) throws IOException, ReflectiveOperationException {
         Class<?> cls = obj.getClass();
@@ -21,19 +23,19 @@ public class Serialization {
 
         DataOutputStream dos = new DataOutputStream(os);
         for (Field fld: fields) {
-            if (fld.getType() == (Class<?>)(byte.class))
+            if (fld.getType() == byte.class)
                 dos.writeByte(fld.getByte(obj));
-            else if (fld.getType() == (Class<?>)(short.class))
+            else if (fld.getType() == short.class)
                 dos.writeShort(fld.getShort(obj));
-            else if (fld.getType() == (Class<?>)(int.class))
+            else if (fld.getType() == int.class)
                 dos.writeInt(fld.getInt(obj));
-            else if (fld.getType() == (Class<?>)(long.class))
+            else if (fld.getType() == long.class)
                 dos.writeLong(fld.getLong(obj));
-            else if (fld.getType() == (Class<?>)(float.class))
+            else if (fld.getType() == float.class)
                 dos.writeFloat(fld.getFloat(obj));
-            else if (fld.getType() == (Class<?>)(double.class))
+            else if (fld.getType() == double.class)
                 dos.writeDouble(fld.getDouble(obj));
-            else if (fld.getType() == (Class<?>)(String.class))
+            else if (fld.getType() == String.class)
                 dos.writeUTF((String)fld.get(obj));
             else
                 throw new RuntimeException("invalid field");
@@ -41,6 +43,7 @@ public class Serialization {
     }
     
     /**
+     * Reads object from stream
      * @param cls class to read
      * @param is input stream to use
      * @throw IOException on io fail
@@ -54,19 +57,19 @@ public class Serialization {
 
         DataInputStream dis = new DataInputStream(is);
         for (Field fld: fields) {
-            if (fld.getType() == (Class<?>)(byte.class))
+            if (fld.getType() == byte.class)
                 fld.setByte(obj, dis.readByte());
-            else if (fld.getType() == (Class<?>)(short.class))
+            else if (fld.getType() == short.class)
                 fld.setShort(obj, dis.readShort());
-            else if (fld.getType() == (Class<?>)(int.class))
+            else if (fld.getType() == int.class)
                 fld.setInt(obj, dis.readInt());
-            else if (fld.getType() == (Class<?>)(long.class))
+            else if (fld.getType() == long.class)
                 fld.setLong(obj, dis.readLong());
-            else if (fld.getType() == (Class<?>)(float.class))
+            else if (fld.getType() == float.class)
                 fld.setFloat(obj, dis.readFloat());
-            else if (fld.getType() == (Class<?>)(double.class))
+            else if (fld.getType() == double.class)
                 fld.setDouble(obj, dis.readDouble());
-            else if (fld.getType() == (Class<?>)(String.class))
+            else if (fld.getType() == String.class)
                 fld.set(obj, dis.readUTF());
             else
                 throw new RuntimeException("invalid field");
