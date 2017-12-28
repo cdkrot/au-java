@@ -77,9 +77,9 @@ public class ZipperTest {
             md.update(buf, 0, cnt);
         }
         
-        String res = "";
+        StringBuilder res = new StringBuilder();
         for (byte b: md.digest())
-            res += String.format("%02X", b);
-        return res;
+            res.append(String.format("%02X", b));
+        return res.toString();
     }
 };

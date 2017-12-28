@@ -11,7 +11,7 @@ import java.util.regex.*;
 public class Zipper {
     /**
      * JVM entry point
-     * @param args -- cli args.
+     * @param args cli args.
      */
     public static void main(String[] args) throws IOException {
         if (args.length != 2) {
@@ -21,8 +21,8 @@ public class Zipper {
 
         try {
             Zipper.extractAll(args[0], args[1], ".");
-        } catch (IOException exc) {
-            System.err.println("IO Exception");
+        } catch (Exception exc) {
+            System.err.println("Fail: " + exc.getMessage());
             System.exit(1);
         }
     };
@@ -72,6 +72,7 @@ public class Zipper {
                     extractEntry(zip, en, base);
             }
         } catch (ZipException ig) {
+            // found file which is not zip
             // nothing to do.
         }
     }
@@ -83,7 +84,7 @@ public class Zipper {
      * @param base, directory to extract to.
      * @throws IOException, on fail with io.
      */
-    public static void extractEntry(ZipFile zip, ZipEntry entry, String base) throws IOException {
+    public static void extractEntry(ZipFile zip, ZipEntry entry, String base) throws ZipException {
         File result = new File(base, entry.getName());
         result.getParentFile().mkdirs();
         
@@ -99,6 +100,8 @@ public class Zipper {
                 
                 out.write(buf, 0, cnt);
             }
+        } catch (IOException ex) {
+            throw new ExtractionException("Failed to extract entry to " + result.getPath());
         }
     }
 };
