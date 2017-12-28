@@ -13,7 +13,7 @@ public class Zipper {
      * JVM entry point
      * @param args cli args.
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         if (args.length != 2) {
             System.err.println("Wrong number of params");
             return;
@@ -21,7 +21,7 @@ public class Zipper {
 
         try {
             Zipper.extractAll(args[0], args[1], ".");
-        } catch (Exception exc) {
+        } catch (ExtractionException exc) {
             System.err.println("Fail: " + exc.getMessage());
             System.exit(1);
         }
@@ -34,7 +34,7 @@ public class Zipper {
      * @param base, where to put the result.
      * @throws IOException, on fail with io.
      */
-    public static void extractAll(String path, String regex, String base) throws IOException {
+    public static void extractAll(String path, String regex, String base) throws ExtractionException {
         extractAll(new File(path), Pattern.compile(regex), base);
     }
     
@@ -45,7 +45,7 @@ public class Zipper {
      * @param base, where to put the result.
      * @throws IOException, on fail with io.
      */
-    public static void extractAll(File path, Pattern regex, String base) throws IOException {
+    public static void extractAll(File path, Pattern regex, String base) throws ExtractionException {
         if (path.isFile()) {
             tryExtract(path, regex, base);
         } else if (path.isDirectory()) {
@@ -61,7 +61,7 @@ public class Zipper {
      * @param base, directory to unpack to.
      * @throws IOException, on fail with io.
      */
-    public static void tryExtract(File path, Pattern regex, String base) throws IOException {
+    public static void tryExtract(File path, Pattern regex, String base) throws ExtractionException {
         try {
             ZipFile zip = new ZipFile(path);
 
@@ -71,7 +71,7 @@ public class Zipper {
                 if (regex.matcher(en.getName()).matches())
                     extractEntry(zip, en, base);
             }
-        } catch (ZipException ig) {
+        } catch (IOException ig) {
             // found file which is not zip
             // nothing to do.
         }
@@ -84,7 +84,7 @@ public class Zipper {
      * @param base, directory to extract to.
      * @throws IOException, on fail with io.
      */
-    public static void extractEntry(ZipFile zip, ZipEntry entry, String base) throws ZipException {
+    public static void extractEntry(ZipFile zip, ZipEntry entry, String base) throws ExtractionException {
         File result = new File(base, entry.getName());
         result.getParentFile().mkdirs();
         

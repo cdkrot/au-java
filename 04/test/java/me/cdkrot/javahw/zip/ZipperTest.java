@@ -17,7 +17,7 @@ public class ZipperTest {
     public TemporaryFolder tmp = new TemporaryFolder();
     
     @Test
-    public void testExtractSimple() throws IOException {
+    public void testExtractSimple() throws Exception {
         String path = "test/resources/test_simple";
         
         Zipper.extractAll(path, "d.*\\.cpp", tmp.getRoot().getPath());
@@ -35,7 +35,7 @@ public class ZipperTest {
     }
 
     @Test
-    public void testExtractEmpty() throws IOException {
+    public void testExtractEmpty() throws Exception {
         String path = "test/resources/test_emptytest";
 
         Zipper.extractAll(path, ".*", tmp.getRoot().getPath());
@@ -43,7 +43,7 @@ public class ZipperTest {
     }
     
     @Test
-    public void testExtractMultiFile() throws IOException {
+    public void testExtractMultiFile() throws Exception {
         String path = "test/resources/test_multifile";
         
         Zipper.extractAll(path, ".*", tmp.getRoot().getPath());
@@ -60,7 +60,7 @@ public class ZipperTest {
         assertTrue(mp.equals(exp));
     }
     
-    private String getFileChecksum(File f) throws IOException {
+    private String getFileChecksum(File f) throws Exception {
         FileInputStream stream = new FileInputStream(f);
         MessageDigest md;
         try {
