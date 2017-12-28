@@ -5,11 +5,14 @@ import java.io.*;
 import java.lang.reflect.*;
 
 /**
- * 
+ * Helper class for serialization
  */
 public class Serialization {
     /**
-     *
+     * @param obj object to write
+     * @param os output stream to use
+     * @throw IOException on io fail
+     * @throw ReflectiveOperationException when failed to work with class
      */
     public static void serialize(Object obj, OutputStream os) throws IOException, ReflectiveOperationException {
         Class<?> cls = obj.getClass();
@@ -36,7 +39,13 @@ public class Serialization {
                 throw new RuntimeException("invalid field");
         }
     }
-        
+    
+    /**
+     * @param cls class to read
+     * @param is input stream to use
+     * @throw IOException on io fail
+     * @throw ReflectiveOperationException when failed to work with class
+     */
     public static <T> T deserialize(Class<T> cls, InputStream is) throws IOException, ReflectiveOperationException {
         T obj = cls.newInstance();
 
