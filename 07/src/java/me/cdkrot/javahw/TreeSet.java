@@ -6,7 +6,7 @@ import java.util.*;
  * Represents set of <T>.
  */
 public class TreeSet<T> implements MyTreeSet<T> {
-    private Random rnd = new Random(228);
+    private Random random = new Random(228);
     private Node<T> root = null;
 
     private Comparator<? super T> cmp = null;
@@ -24,16 +24,21 @@ public class TreeSet<T> implements MyTreeSet<T> {
     }
     
     private static class Node<U> {
-        U value;
-        int prio;
-        Node<U> left;
-        Node<U> right;
-        int size;
-
-        Node<U> prev;
-        Node<U> next;
+        private Node(U val, int prio) {
+            value = val;
+            priority = prio;
+        }
         
-        void recalcStats() {
+        private U value;
+        private int priority;
+        private Node<U> left = null;
+        private Node<U> right = null;
+        private int size = 1;
+
+        private Node<U> prev = null;
+        private Node<U> next = null;
+        
+        private void recalcStats() {
             size = 1;
             if (left != null)
                 size += left.size;
@@ -43,15 +48,7 @@ public class TreeSet<T> implements MyTreeSet<T> {
     }
 
     private Node<T> makeNode(T value) {
-        Node<T> node = new Node<T>();
-        node.value = value;
-        node.prio = rnd.nextInt();
-        node.left = null;
-        node.right = null;
-        node.prev = null;
-        node.next = null;
-        node.size = 1;
-        return node;
+        return new Node<T>(value, random.nextInt());
     }
     
     private static class NodePair<U> {
@@ -204,7 +201,7 @@ public class TreeSet<T> implements MyTreeSet<T> {
         if (r == null)
             return l;
 
-        if (l.prio >= r.prio) {
+        if (l.priority >= r.priority) {
             l.right = merge(l.right, r);
             l.recalcStats();
             return l;
@@ -219,6 +216,7 @@ public class TreeSet<T> implements MyTreeSet<T> {
      * Split root to (<, >=)
      * @param root, the node to split
      * @param key, by which key.
+     * @param cmp comparator to compare
      * @return Pair of split result
      */
     private static <U> NodePair<U> split(Node<U> root, U key, Comparator<? super U> cmp) {
@@ -295,7 +293,7 @@ public class TreeSet<T> implements MyTreeSet<T> {
     
     /**
      * Deletes element from Set
-     * @param value, value to delete
+     * @param v value to delete
      * @return boolean, if deleted
      */
     public boolean remove(Object v) {
@@ -325,7 +323,7 @@ public class TreeSet<T> implements MyTreeSet<T> {
     
     /**
      * Returns whether Set contains Value
-     * @param value to check
+     * @param v value to check
      * @return boolean indicating if set contains element or not
      */
     public boolean contains(Object v) {
