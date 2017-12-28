@@ -46,8 +46,8 @@ public class Serialization {
      * Reads object from stream
      * @param cls class to read
      * @param is input stream to use
-     * @throw IOException on io fail
-     * @throw ReflectiveOperationException when failed to work with class
+     * @throws IOException on io fail
+     * @throws ReflectiveOperationException when failed to work with class
      */
     public static <T> T deserialize(Class<T> cls, InputStream is) throws IOException, ReflectiveOperationException {
         T obj = cls.newInstance();
