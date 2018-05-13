@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.GridPane?>
+
+<?import javafx.geometry.Insets?>
+<ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="Infinity" maxWidth="Infinity"
+            xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="me.cdkrot.javahw.GuiController">
+    <GridPane>
+        <TextField promptText="server" GridPane.columnIndex="0" fx:id="textField"/>
+        <Button GridPane.columnIndex="1" fx:id="connectButton" onMouseClicked="#clickConnect">Connect</Button>
+
+        <Button GridPane.columnIndex="2" fx:id="localButton" onMouseClicked="#clickLocal">Start local server</Button>
+
+        <TreeView GridPane.rowIndex="1" GridPane.columnSpan="3" fx:id="treeView"/>
+    </GridPane>
+</ScrollPane>

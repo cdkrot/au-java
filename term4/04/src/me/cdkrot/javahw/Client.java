@@ -2,38 +2,42 @@ package me.cdkrot.javahw;
 
 import java.io.*;
 import java.net.*;
+import java.util.List;
 import java.util.Scanner;
 
 class Client {
-    static class PairStringBool { // because java truly sucks;
-        String path;
-        boolean isdir;
-    }
-    
-    public static void handleList(String path, DataInputStream input, DataOutputStream output) throws IOException {
+    public static FileEntry[] listDirectory(String path, DataInputStream input, DataOutputStream output) throws IOException {
         output.writeInt(1);
         output.writeUTF(path);
 
         int cnt = input.readInt();
         if (cnt == -1) {
-            System.out.println("Directory " + path + " doesn't exist");
-            return;
+            return null;
         }
-        
+
         if (cnt < 0 || cnt > 1000)
             throw new RuntimeException("Illegal responce");
 
-        PairStringBool res[] = new PairStringBool[cnt];
+        FileEntry res[] = new FileEntry[cnt];
         for (int i = 0; i != cnt; ++i) {
-            res[i] = new PairStringBool();
+            res[i] = new FileEntry();
             res[i].path  = input.readUTF();
-            res[i].isdir = input.readBoolean();
+            res[i].isDir = input.readBoolean();
+        }
+        return res;
+    }
+
+    public static void cliList(String path, DataInputStream input, DataOutputStream output) throws IOException {
+        FileEntry[] list = listDirectory(path, input, output);
+        if (list == null) {
+            System.out.println("Directory " + path + " doesn't exist");
+            return;
         }
 
         System.out.println("Directory listing for " + path);
-        System.out.println("total " + cnt);
-        for (int i = 0; i != cnt; ++i)
-            System.out.println((res[i].isdir ? "d " : "f ") + res[i].path);
+        System.out.println("total " + list.length);
+        for (FileEntry entry: list)
+            System.out.println((entry.isDir ? "d " : "f ") + entry.path);
     }
 
     public static void handleGet(String path, DataInputStream input, DataOutputStream output) throws IOException {
@@ -93,7 +97,7 @@ class Client {
                 System.out.println(line);
                 
                 if (line.startsWith("list "))
-                    handleList(line.substring("list ".length()), input, output);
+                    cliList(line.substring("list ".length()), input, output);
                 else if (line.startsWith("get "))
                     handleGet(line.substring("get ".length()), input, output);
                 else

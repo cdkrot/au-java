@@ -5,11 +5,11 @@ import java.net.*;
 
 class Server {
     public static void handleList(String arg, DataOutputStream client) throws IOException {
-        if (arg == "/")
+        if (arg.equals("/"))
             arg = ".";
-       else if (arg.startsWith("/"))
+        else if (arg.startsWith("/"))
             arg = arg.substring(1);
-        
+
         File dr = new File(arg);
         if (!dr.isDirectory()) {
             client.writeInt(-1);

@@ -6,7 +6,7 @@ sourceSets {
             srcDirs = ['src']
         }
         resources {
-            srcDirs = []
+            srcDirs = ['res']
         }
     }
     test {
@@ -25,4 +25,5 @@ repositories {
 
 dependencies {
     testCompile 'junit:junit:4.12'
+    apply plugin: 'war'
 }
