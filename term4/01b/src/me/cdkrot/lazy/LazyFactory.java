@@ -2,11 +2,23 @@ package me.cdkrot.lazy;
 
 import java.util.function.Supplier;
 
+/**
+ * Factory class for the Lazy interface.
+ */
 class LazyFactory {
+    /**
+     * Creates a new lazy
+     * @param sup Function to generate the result with
+     */
     public static <T> Lazy<T> createLazy(Supplier<T> sup) {
         return new LazyImpl<T>(sup);
     }
 
+    
+    /**
+     * Creates a new lazy which works correctly in the multithreaded environment.
+     * @param sup Function to generate the result with
+     */
     public static <T> Lazy<T> createMultithreadedLazy(Supplier<T> sup) {
         return new LazyMultithreadedImpl<T>(sup);
     }
