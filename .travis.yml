@@ -1,0 +1,6 @@
+language: java
+jdk: openjdk8
+os: linux # well, the ubuntu provided is not technically linux, but.
+
+script: 
+  - ./build.sh
