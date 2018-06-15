@@ -74,23 +74,23 @@ public class XUnit {
 
         analyseMethods(cls, before, beforeClass, after, afterClass, test);
 
-        for (Method mtd: beforeClass)
-            mtd.invoke(obj);
+        for (Method method: beforeClass)
+            method.invoke(obj);
 
         for (TestMethod testMethod: test){
             if (!testMethod.ignore.equals("")) {
-                log.println("Ignoring test " + testMethod.mtd.getName() + " due to: " + testMethod.ignore);
+                log.println("Ignoring test " + testMethod.method.getName() + " due to: " + testMethod.ignore);
                 numIgnored += 1;
                 continue;   
             }
             
             Class<?> eclass = Test.noneClass.class;
 
-            for (Method mtd: before)
-                mtd.invoke(obj);
+            for (Method method: before)
+                method.invoke(obj);
                 
             try {
-                testMethod.mtd.invoke(obj);
+                testMethod.method.invoke(obj);
             } catch (InvocationTargetException e) {
                 eclass = e.getTargetException().getClass();
             } catch (Exception e) {
@@ -98,21 +98,21 @@ public class XUnit {
             }
 
             if (eclass != testMethod.expected) {
-                log.println("In test " + testMethod.mtd.getName() + ", unexpected exception, expected " + testMethod.expected.getName() + " got " + eclass.getName());
+                log.println("In test " + testMethod.method.getName() + ", unexpected exception, expected " + testMethod.expected.getName() + " got " + eclass.getName());
 
                 numFailed += 1;
             } else {
-                log.println("OK " + testMethod.mtd.getName());
+                log.println("OK " + testMethod.method.getName());
                 numOK += 1;
             }
 
                             
-            for (Method mtd: after)
-                mtd.invoke(obj);
+            for (Method method: after)
+                method.invoke(obj);
         }
         
-        for (Method mtd: afterClass)
-            mtd.invoke(obj);
+        for (Method method: afterClass)
+            method.invoke(obj);
 
         log.println("Completed");
         log.println("Total " + (numOK + numFailed + numIgnored) + " tests, " + numIgnored + " ignored, " + numOK + " succeeded and " + numFailed + " failed");
@@ -131,40 +131,40 @@ public class XUnit {
         Method[] methods = cls.getMethods();
         Arrays.sort(methods, Comparator.comparing(Method::getName));
         
-        for (Method mtd: methods) {
+        for (Method method: methods) {
             boolean allready = false;
 
-            Annotation an[] = mtd.getDeclaredAnnotations();
+            Annotation an[] = method.getDeclaredAnnotations();
             for (Annotation a: an) {
                 boolean ths = false;
             
                 if (a.annotationType() == After.class) {
-                    after.add(mtd);
+                    after.add(method);
                     ths = true;
                 }
                 
                 if (a.annotationType() == Before.class) {
-                    before.add(mtd);
+                    before.add(method);
                     ths = true;
                 }
                 
                 if (a.annotationType() == AfterClass.class) {
-                    afterClass.add(mtd);
+                    afterClass.add(method);
                     ths = true;
                 }
 
                 if (a.annotationType() == BeforeClass.class) {
-                    beforeClass.add(mtd);
+                    beforeClass.add(method);
                     ths = true;
                 }
 
                 if (a.annotationType() == Test.class) {
-                    test.add(new TestMethod(mtd, (Test)a));
+                    test.add(new TestMethod(method, (Test)a));
                     ths = true;
                 }
 
                 if (ths && allready)
-                    throw new InvalidAnnotations("Invalid annotations in method " + mtd.getName());
+                    throw new InvalidAnnotations("Invalid annotations in method " + method.getName());
 
                 if (ths)
                     allready = true;
@@ -173,16 +173,15 @@ public class XUnit {
     }
 
     private static class TestMethod {
-        public TestMethod() {}
         public TestMethod(Method method, Test tst) {
             this.method = method;
             expected = tst.expected();
             ignore   = tst.ignore();
         }
         
-        public const Method method;
-        public const Class<?> expected;
-        public const String ignore;
+        public final Method method;
+        public final Class<?> expected;
+        public final String ignore;
     }
 
     /**
