@@ -8,11 +8,21 @@ import java.net.*;
 import java.util.*;
 import me.cdkrot.xunit.annotations.*;
 
-class XUnit {
+/**
+ * Main class for testing.
+ */
+public class XUnit {
+    /**
+     * Prints usage to the stderr.
+     */
     public static void usage() {
         System.err.println("usage: <classes-root> <classname>");
     }
-    
+
+    /**
+     * CLI-Entry point.
+     * @param args cli args.
+     */
     public static void main(String[] args) {
         if (args.length != 2) {
             usage();
@@ -29,7 +39,7 @@ class XUnit {
         }
 
         try {
-            Class cls = loader.loadClass(args[1]);
+            Class<?> cls = loader.loadClass(args[1]);
             testClass(cls, System.err);
         } catch (ClassNotFoundException ex) {
             System.err.println("Class " + args[1] + " was not found");
@@ -43,7 +53,13 @@ class XUnit {
         }
     }
 
-    public static void testClass(Class cls, PrintStream log) throws Exception {
+    /**
+     * Tests the specified class and writes result to specified log stream
+     * @param cls class to test
+     * @param log stream to write testing log
+     * @throws Exception when something wents wrong (e.g. reflection error).
+     */
+    public static void testClass(Class<?> cls, PrintStream log) throws Exception {
         int numIgnored = 0;
         int numOK      = 0;
         int numFailed  = 0;
@@ -56,7 +72,7 @@ class XUnit {
         List<Method> afterClass  = new ArrayList<Method>();
         List<TestMethod> test    = new ArrayList<TestMethod>();
 
-        analyzeMethods(cls, before, beforeClass, after, afterClass, test);
+        analyseMethods(cls, before, beforeClass, after, afterClass, test);
 
         for (Method mtd: beforeClass)
             mtd.invoke(obj);
@@ -68,7 +84,7 @@ class XUnit {
                 continue;   
             }
             
-            Class eclass = Test.noneClass.class;
+            Class<?> eclass = Test.noneClass.class;
 
             for (Method mtd: before)
                 mtd.invoke(obj);
@@ -102,7 +118,16 @@ class XUnit {
         log.println("Total " + (numOK + numFailed + numIgnored) + " tests, " + numIgnored + " ignored, " + numOK + " succeeded and " + numFailed + " failed");
     }
 
-    public static void analyzeMethods(Class cls, List<Method> before, List<Method> beforeClass, List<Method> after, List<Method> afterClass, List<TestMethod> test) throws Exception {
+    /**
+     * Analyses class methods and puts them to correspoding list
+     * @param cls class to analyse
+     * @param before      list for "before" annotated methods.
+     * @param after       list for "after" annotated methods.
+     * @param beforeClass list for "beforeClass" annotated methods.
+     * @param afterClass  list for "afterClass" annotated methods.
+     * @param test        list for test annotated methods.x
+     */
+    public static void analyseMethods(Class<?> cls, List<Method> before, List<Method> beforeClass, List<Method> after, List<Method> afterClass, List<TestMethod> test) throws Exception {
         Method[] methods = cls.getMethods();
         Arrays.sort(methods, Comparator.comparing(Method::getName));
         
@@ -147,19 +172,22 @@ class XUnit {
         }
     }
 
-    public static class TestMethod {
+    private static class TestMethod {
         public TestMethod() {}
-        public TestMethod(Method mtd, Test tst) {
-            this.mtd = mtd;
+        public TestMethod(Method method, Test tst) {
+            this.method = method;
             expected = tst.expected();
             ignore   = tst.ignore();
         }
         
-        public Method mtd;
-        public Class expected;
-        public String ignore;
+        public const Method method;
+        public const Class<?> expected;
+        public const String ignore;
     }
-        
+
+    /**
+     * Generic XUnit exception class
+     */
     public static class XUnitException extends RuntimeException {
         public XUnitException() {
             super();
@@ -171,6 +199,9 @@ class XUnit {
 
     }
 
+    /**
+     * Exception, which represents that annotations are invalid.
+     */
     public static class InvalidAnnotations extends XUnitException {
         public InvalidAnnotations() {
             super();
