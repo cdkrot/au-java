@@ -3,9 +3,15 @@ package me.cdkrot.javahw;
 import java.io.*;
 import java.net.*;
 
-class Server {
+public class Server {
+    /**
+     * Should be called when client has requested "list" operation.
+     * @param arg request parameter
+     * @param client stream to write the answer to
+     * @throws IOException when stream fails.
+     */
     public static void handleList(String arg, DataOutputStream client) throws IOException {
-        if (arg == "/")
+        if (arg.equals("/"))
             arg = ".";
        else if (arg.startsWith("/"))
             arg = arg.substring(1);
@@ -24,6 +30,12 @@ class Server {
         }
     }
 
+    /**
+     * Should be called when client has requested "get" operation.
+     * @param arg request parameter
+     * @param client stream to write the answer to
+     * @throws IOException when stream fails.
+     */
     public static void handleGet(String arg, DataOutputStream client) throws IOException {
         if (arg.startsWith("/"))
             arg = arg.substring(1);
@@ -59,7 +71,11 @@ class Server {
         client.writeInt(size);
         client.write(buffer, 0, size);
     }
-    
+
+    /**
+     * Handles the client (expectedly runned in new thread)
+     * @param client client socket
+     */
     public static void handleClient(Socket client) {
         try (DataInputStream input = new DataInputStream(client.getInputStream());
              DataOutputStream output = new DataOutputStream(client.getOutputStream())) {
@@ -74,9 +90,13 @@ class Server {
                     handleGet(arg, output);
             }
         } catch (IOException ex) {
+            System.err.println("Input/Output fail");
         }
     }
-    
+
+    /**
+     * Entry function for the server
+     */
     public static void main(String[] args) throws IOException {
         int port = 2030;
 
