@@ -106,13 +106,13 @@ public class TestCountDownLatch {
     }
 
     @Test
-    public void interruptTest() {
+    public void interruptTest() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(0);
         Thread thr = new Thread(() -> {
             boolean ok = false;
             try {
                 latch.countDown();
-            } catch (InterruptedException) {
+            } catch (InterruptedException ex) {
                 ok = true;
             }
 
