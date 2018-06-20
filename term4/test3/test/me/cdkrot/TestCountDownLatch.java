@@ -98,9 +98,32 @@ public class TestCountDownLatch {
 
         thr.start();
         latch.countDown();
-        thr.join();
 
         // Checking, that count down didn't happened until other thread increased.
         assertTrue(happened[0]);
+
+        thr.join();
+    }
+
+    @Test
+    public void interruptTest() {
+        CountDownLatch latch = new CountDownLatch(0);
+        Thread thr = new Thread(() -> {
+            boolean ok = false;
+            try {
+                latch.countDown();
+            } catch (InterruptedException) {
+                ok = true;
+            }
+
+            assertTrue(ok);
+        });
+
+        thr.start();
+        Thread.sleep(500);
+
+        thr.interrupt();
+        thr.join();
+        latch.await();
     }
 }
