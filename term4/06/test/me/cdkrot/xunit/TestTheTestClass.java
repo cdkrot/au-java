@@ -16,6 +16,9 @@ public class TestTheTestClass {
         
         XUnit.testClass(TheTestClass.class, log);
 
+        String result = out.toString();
+        result = result.replace(System.lineSeparator(), "\n");
+        
         assertTrue(out.toString().equals
                    ("[[Before class called]]\n" +
                     "[[Before called]]\n" +
