@@ -13,7 +13,7 @@ public class ThreadPool implements AutoCloseable {
     /**
      * Creates new Thread Pool with specified number of threads.
      * @param k number of threads
-     * @throws if k below zero.
+     * @throws IllegalArgumentException if k below zero.
      */
     public ThreadPool(int k) {
         if (k <= 0)
@@ -22,6 +22,7 @@ public class ThreadPool implements AutoCloseable {
         threads = new Thread[k];
         for (int i = 0; i != k; ++i) {
             threads[i] = new Thread(new ThreadWorker());
+            threads[i].setDaemon(true);
             threads[i].start();
         }
     }
@@ -36,13 +37,15 @@ public class ThreadPool implements AutoCloseable {
             }
             
             terminated = true;
-            this.notifyAll();
         }
         
         for (int i = 0; i != threads.length; ++i)
             try {
+                threads[i].interrupt();
                 threads[i].join();
-            } catch (Exception ex) {}
+            } catch (InterruptedException ex) {throw new RuntimeException(ex);}
+
+        
     }
     
     /**
@@ -89,15 +92,14 @@ public class ThreadPool implements AutoCloseable {
      */
     protected LightFuture<?> getNextFuture() {
         synchronized (this) {
-            while (!terminated && queue.isEmpty())
+            while (queue.isEmpty())
                 try {
                     this.wait();
-                } catch (Exception ex) {}
+                } catch (InterruptedException ex) {
+                    return null;
+                }
 
-            if (!queue.isEmpty())
-                return queue.poll();
-            else
-                return null;
+            return queue.poll();
         }
     }
 
@@ -110,8 +112,9 @@ public class ThreadPool implements AutoCloseable {
             while (true) {
                 LightFuture<?> future = getNextFuture();
 
-                if (future == null)
+                if (future == null) {
                     return; // pool has terminated.
+                }
 
                 future.compute();
             }

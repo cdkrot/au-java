@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 public class LightFuture<R> {
     private ThreadPool pool;
     private Supplier<R> supplier;
-    private boolean computed = false;
+    private volatile boolean computed = false;
     private R result;
     private Exception caught;
     
@@ -24,9 +24,7 @@ public class LightFuture<R> {
      * @return is the value computed.
      */
     public boolean isReady() {
-        synchronized (this) {
-            return computed;
-        }
+        return computed;
     }
 
     /**
@@ -34,16 +32,16 @@ public class LightFuture<R> {
      * @return computed result
      * @throws LightException if async computation has failed with exception.
      */
-    public R get() {
+    public R get() throws LightException {
         synchronized (this) {
             while (!computed)
                 try {
                     this.wait();
-                } catch (Exception ex) {}
+                } catch (InterruptedException ignore) {}
         }
 
         if (caught != null)
-            throw new LightException(caught);
+            throw new LightException("Got exception during method invokation", caught);
         return result;
     }
 
@@ -54,7 +52,22 @@ public class LightFuture<R> {
      * @return new future associated with the same thread pool as this one.
      */
     public <T> LightFuture<T> thenApply(Function<R, T> f) {
-        return pool.add(() -> f.apply(get()));
+        return pool.add(() -> {
+                try {
+                    return f.apply(get());
+                } catch (LightException ex) {
+                    throw new RuntimeException(ex);
+                }});
+    }
+
+    protected void fail() {
+        caught = new RuntimeException("abandoned due to shutdown");
+        
+                
+        synchronized (this) {
+            computed = true;
+            this.notifyAll();
+        }
     }
     
     protected void compute() {

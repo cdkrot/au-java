@@ -3,22 +3,13 @@ package me.cdkrot.threads;
 /**
  * Represents caught exception, throwed by some Supplier.
  */
-public class LightException extends RuntimeException {
-    private Exception exception;
-
+public class LightException extends Exception {
     /**
      * Constructs new light exception
-     * @param exception from supplier
+     * @param string reason of exception
+     * @param throwable from supplier
      */
-    protected LightException(Exception exception) {
-        this.exception = exception;
-    }
-
-    /**
-     * Returns the exception
-     * @return exception
-     */
-    public Exception get() {
-        return exception;
+    protected LightException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

@@ -9,7 +9,7 @@ import static org.junit.Assert.assertTrue;
 
 public class TestThreadPool {
     @Test
-    public void testThreadPoolOneThread() {
+    public void testThreadPoolOneThread() throws LightException {
         ThreadPool pool = new ThreadPool(1);
         
         LightFuture<String> a = pool.add(() -> "123");
@@ -27,14 +27,14 @@ public class TestThreadPool {
     }
 
     @Test
-    public void testThreadPoolTwoThread() {
+    public void testThreadPoolTwoThread() throws LightException {
         ThreadPool pool = new ThreadPool(2);
 
         LightFuture<?> futures[] = new LightFuture<?>[10];
 
         for (int i = 0; i != 10; ++i) {
             int j = i;
-            futures[i] = pool.add(() -> new Integer(j));
+            futures[i] = pool.add(() -> j);
         }
 
         for (int i = 0; i != 10; ++i)
@@ -44,10 +44,10 @@ public class TestThreadPool {
 
 
     @Test
-    public void testConsequentialness() {
+    public void testConsequentialness() throws LightException {
         ThreadPool pool = new ThreadPool(2);
 
-        LightFuture<Integer> cur = pool.add(() -> new Integer(0));
+        LightFuture<Integer> cur = pool.add(() -> 0);
         for (int i = 0; i != 100; ++i)
             cur = cur.thenApply((val) -> val + 1);
 
@@ -56,7 +56,7 @@ public class TestThreadPool {
     }
 
     @Test(expected=LightException.class)
-    public void testLightException() {
+    public void testLightException() throws LightException {
         try (ThreadPool pool = new ThreadPool(2)) {
             LightFuture<Object> cur = pool.add(() -> {throw new RuntimeException("kek");});
             cur.get();
@@ -64,7 +64,7 @@ public class TestThreadPool {
     }
 
     @Test
-    public void testMultithreaded() {
+    public void testMultithreaded() throws LightException {
         ThreadPool pool = new ThreadPool(3);
 
         Thread threads[] = new Thread[10];
@@ -78,7 +78,7 @@ public class TestThreadPool {
                         ArrayList<Integer> expected = new ArrayList<Integer>();
 
 
-                        futures.add(pool.add(() -> new Integer(1)));
+                        futures.add(pool.add(() -> 1));
                         expected.add(1);
                         Random rnd = new Random(j);
 
@@ -91,13 +91,17 @@ public class TestThreadPool {
                                 expected.add((expected.get(i) + d) % 1000);
                             } else {
                                 int z = rnd.nextInt(1000);
-                                futures.add(pool.add(() -> new Integer(z)));
+                                futures.add(pool.add(() -> z));
                                 expected.add(z);
                             }
                         }
 
                         for (int i = 0; i != 500; ++i)
-                            assertEquals(futures.get(i).get(), expected.get(i));
+                            try {
+                                assertEquals(futures.get(i).get(), expected.get(i));
+                            } catch (LightException ex) {
+                                throw new RuntimeException(ex);
+                            }
                     }
                 };
         }
