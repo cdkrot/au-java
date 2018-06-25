@@ -7,8 +7,10 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.*;
 
-import javax.swing.event.HyperlinkEvent;
+import javafx.concurrent.Task;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -36,6 +38,86 @@ public class GuiController {
         connectButton.setDisable(b);
     }
 
+    /**
+     * Setups the treeView
+     */
+    public void initialize() {
+        treeView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    TreeViewItem item = (TreeViewItem)(treeView.getSelectionModel().getSelectedItem());
+                    
+                    if (item != null && item.isLeaf() && event.getClickCount() == 2) {
+                        saveFile(item.getFullPath(), item.getBaseName());
+                    }
+                }
+            });
+    }
+
+    /**
+     * Handles the file saving
+     * @param path to fetch
+     * @param basename suggested name to save
+     */
+    public void saveFile(String path, String basename) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName(basename);
+
+        Window window = treeView.getScene().getWindow();
+        File destination = fileChooser.showSaveDialog(window);
+        if (destination == null || destination.isDirectory()) {
+            Alert alert;
+            alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Selected destination is not valid");
+            alert.show();
+            return;
+        }
+
+        Task task = new Task<Boolean>() {
+                @Override
+                public Boolean call() {
+                    byte[] data;
+                    try {
+                        data = Client.getFile(path, socketInput, socketOutput);
+                    } catch (IOException ex) {
+                        return false;
+                    }
+
+                    if (data == null)
+                        return false;
+                
+                    try (FileOutputStream stream = new FileOutputStream(destination)) {
+                        stream.write(data);
+                    } catch (IOException ex) {
+                        return false;
+                    }
+
+                    return true;
+                }
+            };
+
+        task.setOnSucceeded((event) -> {
+                boolean res = ((Task<Boolean>)(event.getSource())).getValue();
+                Alert alert;
+                if (res) {
+                    alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Download succeeded");
+                } else {
+                    alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Download failed");
+
+                }
+                
+                alert.show();
+            });
+
+        (new Thread(task)).start();
+    }
+
+    /**
+     * Handles the connect button clicks
+     * @param mouseEvent ignored
+     */
     public void clickConnect(MouseEvent mouseEvent) {
         try {
             lock(true);
@@ -56,10 +138,17 @@ public class GuiController {
         }
     }
 
+    /**
+     * Reloads the tree view.
+     */
     private void resetTreeView() {
         treeView.setRoot(new TreeViewItem("/", new FileEntry("/", true)));
     }
 
+    /**
+     * changes the server button state
+     * @param on is running
+     */
     public void reactivateStartServerButton(boolean on){
         if (on)
             localButton.setText("Stop local server");
@@ -67,9 +156,17 @@ public class GuiController {
             localButton.setText("Start local server");
     }
 
+    /**
+     * Spawns or stops local server
+     * @param mouseEvent ignored
+     */ 
     public void clickLocal(MouseEvent mouseEvent) {
         if (serverThread != null) {
             serverThread.interrupt();
+            try {
+                serverThread.join();
+            } catch (InterruptedException ex) {}
+            
             serverThread = null;
             reactivateStartServerButton(false);
         } else {
@@ -90,6 +187,11 @@ public class GuiController {
         }
     }
 
+    /**
+     * Represents an entry in the tree view.
+     *
+     * Performs dynamic content loading
+     */
     private class TreeViewItem extends TreeItem<FileEntry> {
         private FileEntry entry;
         private String fullpath;
@@ -106,6 +208,14 @@ public class GuiController {
             return !entry.isDir;
         }
 
+        public String getFullPath() {
+            return fullpath;
+        }
+
+        public String getBaseName() {
+            return entry.path;
+        }
+        
         @Override
         public ObservableList<TreeItem<FileEntry>> getChildren() {
             if (!loaded) {
