@@ -6,17 +6,18 @@ import java.net.*;
 public class Server {
     /**
      * Should be called when client has requested "list" operation.
+     * @param root file-serving root
      * @param arg request parameter
      * @param client stream to write the answer to
      * @throws IOException when stream fails.
      */
-    public static void handleList(String arg, DataOutputStream client) throws IOException {
+    public static void handleList(String root, String arg, DataOutputStream client) throws IOException {
         if (arg.equals("/"))
             arg = ".";
        else if (arg.startsWith("/"))
             arg = arg.substring(1);
         
-        File dr = new File(arg);
+        File dr = new File(root, arg);
         if (!dr.isDirectory()) {
             client.writeInt(-1);
             return;
@@ -32,18 +33,24 @@ public class Server {
 
     /**
      * Should be called when client has requested "get" operation.
+     * @param root file-serving root
      * @param arg request parameter
      * @param client stream to write the answer to
      * @throws IOException when stream fails.
      */
-    public static void handleGet(String arg, DataOutputStream client) throws IOException {
+    public static void handleGet(String root, String arg, DataOutputStream client) throws IOException {
         if (arg.startsWith("/"))
             arg = arg.substring(1);
         
         byte[] buffer = new byte[10];
         int size = 0;
-        
-        try (InputStream is = new FileInputStream(arg)) {
+
+        if (!(new File(root, arg)).isFile()) {
+            client.writeInt(-1);
+            return;
+        }
+            
+        try (InputStream is = new FileInputStream(new File(root, arg))) {
             while (is.available() > 0) {
                 byte[] chunk = new byte[1024];
                 int len = is.read(chunk);
@@ -71,31 +78,46 @@ public class Server {
         client.writeInt(size);
         client.write(buffer, 0, size);
     }
-
+    
     /**
      * Handles the client (expectedly runned in new thread)
-     * @param client client socket
+     * @param root file-serving root
+     * @param inputStream stream to read from
+     * @param inputStream stream to write to
      */
-    public static void handleClient(Socket client) {
-        try (DataInputStream input = new DataInputStream(client.getInputStream());
-             DataOutputStream output = new DataOutputStream(client.getOutputStream())) {
+    public static void handleClient(String root, InputStream inputStream, OutputStream outputStream) throws IOException {
+        try (DataInputStream input = new DataInputStream(inputStream);
+             DataOutputStream output = new DataOutputStream(outputStream)) {
 
             while (true) {
                 int type = input.readInt();
                 String arg = input.readUTF();
 
                 if (type == 1)
-                    handleList(arg, output);
+                    handleList(root, arg, output);
                 if (type == 2)
-                    handleGet(arg, output);
+                    handleGet(root, arg, output);
             }
-        } catch (IOException ex) {
-            System.err.println("Input/Output fail");
         }
     }
 
     /**
+     * Handles the client (expectedly runned in new thread)
+     * @param root file-serving root
+     * @param inputStream stream to read from
+     * @param inputStream stream to write to
+     */
+    public static void handleClient(String root, Socket socket) throws IOException {
+        try (InputStream input = socket.getInputStream();
+             OutputStream output = socket.getOutputStream()) {
+            handleClient(root, input, output);
+        }
+    }
+
+    
+    /**
      * Entry function for the server
+     * @param args cli args
      */
     public static void main(String[] args) throws IOException {
         int port = 2030;
@@ -111,11 +133,13 @@ public class Server {
                     new Thread() {
                         @Override
                         public void run() {
-                            handleClient(client);
                             
                             try {
+                                handleClient(".", client);
                                 client.close();
-                            } catch (IOException ex) {}
+                            } catch (IOException ex) {
+                                System.err.println("Input/Output error");
+                            }
                         }
                     }.start();
                 } catch (Exception ex) {
